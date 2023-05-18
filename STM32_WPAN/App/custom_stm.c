@@ -23,7 +23,8 @@
 #include "custom_stm.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "main.h"
+#include "impulse_control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -148,6 +149,11 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
   aci_gatt_write_permit_req_event_rp0   *write_perm_req;
   Custom_STM_App_Notification_evt_t     Notification;
   /* USER CODE BEGIN Custom_STM_Event_Handler_1 */
+  static uint32_t rx_current = 1;
+  static uint32_t rx_freq = 20;
+  static uint32_t rx_pulse_dur = 150;
+  static uint32_t period_on = 15;
+  static uint32_t period_off = 15;
 
   /* USER CODE END Custom_STM_Event_Handler_1 */
 
@@ -301,35 +307,40 @@ static SVCCTL_EvtAckStatus_t Custom_STM_Event_Handler(void *Event)
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_1_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
-
+            rx_current = attribute_modified->Attr_Data[0];
+            change_current(rx_current);
             /* USER CODE END CUSTOM_STM_Service_1_Char_1_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
           } /* if (attribute_modified->Attr_Handle == (CustomContext.CustomCurrent_MaHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
           else if (attribute_modified->Attr_Handle == (CustomContext.CustomFrequency_HzHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_2_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
-
+            rx_freq = attribute_modified->Attr_Data[0];
+            change_frequency(rx_freq);
             /* USER CODE END CUSTOM_STM_Service_1_Char_2_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
           } /* if (attribute_modified->Attr_Handle == (CustomContext.CustomFrequency_HzHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
           else if (attribute_modified->Attr_Handle == (CustomContext.CustomPulse_Dur_UsHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_3_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
-
+            rx_pulse_dur = attribute_modified->Attr_Data[0];
+            change_pulse_duration(rx_pulse_dur, period_on, period_off);
             /* USER CODE END CUSTOM_STM_Service_1_Char_3_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
           } /* if (attribute_modified->Attr_Handle == (CustomContext.CustomPulse_Dur_UsHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
           else if (attribute_modified->Attr_Handle == (CustomContext.CustomDur_Per_On_SHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_4_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
-
+            period_on = attribute_modified->Attr_Data[0];
+            change_pulse_duration(rx_pulse_dur, period_on, period_off);
             /* USER CODE END CUSTOM_STM_Service_1_Char_4_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
           } /* if (attribute_modified->Attr_Handle == (CustomContext.CustomDur_Per_On_SHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
           else if (attribute_modified->Attr_Handle == (CustomContext.CustomDur_Per_Off_SHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))
           {
             return_value = SVCCTL_EvtAckFlowEnable;
             /* USER CODE BEGIN CUSTOM_STM_Service_1_Char_5_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
-
+            period_off = attribute_modified->Attr_Data[0];
+            change_pulse_duration(rx_pulse_dur, period_on, period_off);
             /* USER CODE END CUSTOM_STM_Service_1_Char_5_ACI_GATT_ATTRIBUTE_MODIFIED_VSEVT_CODE */
           } /* if (attribute_modified->Attr_Handle == (CustomContext.CustomDur_Per_Off_SHdle + CHARACTERISTIC_VALUE_ATTRIBUTE_OFFSET))*/
           /* USER CODE BEGIN EVT_BLUE_GATT_ATTRIBUTE_MODIFIED_END */
